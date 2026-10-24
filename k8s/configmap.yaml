@@ -1,0 +1,21 @@
+# 非機密設定：區域、模型 inference profile、限流與執行模式。
+# 機密（若有）走 Secret，不放這裡。AWS 憑證不透過 ConfigMap/Secret 注入，
+# 正式環境建議用 IRSA（IAM Roles for Service Accounts）。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appeal-workbench-config
+  namespace: appeal-workbench
+  labels:
+    app.kubernetes.io/name: appeal-workbench
+data:
+  AWS_REGION: "us-west-2"
+  BEDROCK_MODEL_WRITER: "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  BEDROCK_MODEL_LIGHT: "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  BEDROCK_EMBED_MODEL: "cohere.embed-multilingual-v3"
+  # ≤1 RPS 規範：最小間隔 1.05 秒。
+  # 注意：行程內 + 跨行程本機鎖只在「單一 Pod」內有效。
+  # 多副本時每個 Pod 各自守 1 RPS，帳號層級總和會超標 —— 見 deployment.yaml 的 replicas 說明。
+  BEDROCK_MIN_INTERVAL: "1.05"
+  BEDROCK_DRY_RUN: "0"
+  BEDROCK_NO_CACHE: "0"

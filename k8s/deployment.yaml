@@ -1,0 +1,89 @@
+# ============================================================================
+# Streamlit 工作台 Deployment
+#
+# ★ 重要（競賽規範 ≤1 RPS）：
+#   core/bedrock_client.py 的節流是「行程內 Lock + 單機檔案鎖」，只在單一 Pod
+#   內有效。多個 Pod 各自守 1 RPS，帳號層級總和會超過 1 RPS，違反規範。
+#   因此本 Deployment 刻意固定 replicas: 1，HPA 也只對「非 Bedrock 路徑」示範水平擴充，
+#   不能用來平行放大 Bedrock 呼叫量。詳見 hpa.yaml 的說明。
+#
+#   若未來要在多副本下仍守帳號層級 1 RPS，需改為「集中式分散鎖」
+#   （例如 Redis 令牌桶 / DynamoDB 條件寫入的全域 timestamp），
+#   取代目前的單機檔案鎖。這是已知限制，不是這份 manifest 能單獨解決的。
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appeal-workbench
+  namespace: appeal-workbench
+  labels:
+    app.kubernetes.io/name: appeal-workbench
+    app.kubernetes.io/component: web
+spec:
+  # 見檔頭說明：Bedrock ≤1 RPS 的單機鎖使 Bedrock 呼叫無法安全水平擴充。
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: appeal-workbench
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: appeal-workbench
+        app.kubernetes.io/component: web
+    spec:
+      # 正式環境建議綁定具 Bedrock 權限的 IRSA ServiceAccount，取代長期金鑰
+      # serviceAccountName: appeal-workbench-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: appeal-workbench
+          image: ntpc-appeal-workbench:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: appeal-workbench-config
+            - secretRef:
+                name: appeal-workbench-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          # 存活探針：掛了就重啟
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # 就緒探針：沒就緒就不導流量進來
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL

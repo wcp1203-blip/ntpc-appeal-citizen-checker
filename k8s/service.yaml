@@ -1,0 +1,18 @@
+# 叢集內部服務。對外曝露建議再加 Ingress（附 TLS），而非直接 LoadBalancer，
+# 以符合「不對外全開」的安全原則。
+apiVersion: v1
+kind: Service
+metadata:
+  name: appeal-workbench
+  namespace: appeal-workbench
+  labels:
+    app.kubernetes.io/name: appeal-workbench
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: appeal-workbench
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

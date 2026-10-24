@@ -1,0 +1,51 @@
+# === 機密與憑證（絕不進入 image）===
+.env
+.env.*
+!.env.example
+*.pem
+aws_credentials*
+
+# === Python 執行產物 ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.ipynb_checkpoints/
+
+# === 含個資 / 可重建的資料（不得進 image，呼應競賽規範）===
+data/raw/
+data/parsed/
+data/cache/
+data/simulated_cases/
+data/kb_source/
+models/*.pkl
+models/*.joblib
+*.faiss
+*.npy
+
+# === Henry 可重建輸出 ===
+henry/output_json/
+henry/*_predictions*.jsonl
+henry/*_report*.txt
+henry/kb_index.json
+
+# === 版控與開發環境（image 內不需要）===
+.git/
+.gitignore
+.github/
+.kiro/
+
+# === 容器自身檔案，避免遞迴 build context ===
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# === 文件（縮小 build context；如需可移除）===
+*.md
+README*.md
+
+# === OS ===
+.DS_Store
+Thumbs.db

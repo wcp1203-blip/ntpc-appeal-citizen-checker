@@ -1,0 +1,10 @@
+# 民眾版（app/citizen_app.py）部署用相依套件。
+# 刻意**不含 boto3 / pymupdf / scikit-learn 等承辦人版相依**：
+# 民眾版第一階段完全不呼叫 LLM、不連 AWS，只用 core 的純規則模組。
+
+streamlit>=1.34.0        # 民眾版網頁介面（手機優先單頁）
+python-docx>=1.1.0       # 訴願書 .docx 匯出（core.citizen_template.to_docx）
+python-dotenv>=1.0.0     # core.env 啟動時載入 .env（選用；未安裝也能跑，只是不自動載入設定）
+
+# 測試（部署不需要，CI 與本地驗證用）
+pytest>=8.0.0

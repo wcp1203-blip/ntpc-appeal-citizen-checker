@@ -1,0 +1,42 @@
+# ============================================================================
+# 本機容器化 Demo：一行 `docker compose up` 起 Streamlit 工作台
+#
+# 預設走離線 dry-run（BEDROCK_DRY_RUN=1），不需 AWS 權限即可看介面與控制流。
+# 要跑真實 Bedrock / KB：
+#   1. 準備好 .env（含 BEDROCK_KB_ID、兩個 inference profile 等）
+#   2. 把下方 BEDROCK_DRY_RUN 改為 0（或在 .env 設定後移除此行覆寫）
+#   3. 掛載本機 AWS credential chain（見 volumes 註解）
+# ============================================================================
+services:
+  appeal-workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ntpc-appeal-workbench:latest
+    container_name: appeal-workbench
+    ports:
+      - "8501:8501"
+    env_file:
+      # .env 不進版控；不存在時 compose 會略過（需先 cp .env.example .env）
+      - path: .env
+        required: false
+    environment:
+      # 預設離線 demo；正式 Demo 時改為 "0" 並確認 .env 已設 KB 與模型
+      BEDROCK_DRY_RUN: "1"
+      AWS_REGION: "us-west-2"
+    volumes:
+      # 讀取本機 AWS 憑證（唯讀）。走真實 Bedrock 時取消註解；
+      # 憑證不進 image、不進版控，符合競賽規範。
+      # - ${HOME}/.aws:/home/appuser/.aws:ro
+      []
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3).status==200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

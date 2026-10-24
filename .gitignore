@@ -1,0 +1,45 @@
+# === 憑證與機密（競賽規範第 8 點：GitHub 不得含憑證）===
+.env
+.env.*
+# 範本檔不含機密，需提交供隊友參考（gitignore 不支援行內註解，故獨立成行）
+!.env.example
+*.pem
+aws_credentials*
+# 注意：~/.aws/ 在使用者家目錄，本來就不在 repo 內
+
+# === Python ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.ipynb_checkpoints/
+
+# === 資料與快取（含個資，不得上 Git；競賽規範第 2 點）===
+data/raw/
+data/parsed/
+data/cache/
+data/simulated_cases/
+models/*.pkl
+models/*.joblib
+*.faiss
+*.npy
+
+# === Henry pipeline 可重建的執行輸出 ===
+henry/output_json/
+henry/*_predictions*.jsonl
+henry/*_report*.txt
+# 向量索引：內含 embedding 浮點陣列，每次重建都產生上百 KB 的不可讀 diff，
+# 且容易造成合併衝突。以 `python rag_triage.py build` 重建即可。
+henry/kb_index.json
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === 重要：不可 ignore .kiro（競賽規範第 9 點，需展示 specs/hooks/steering）===
+!.kiro/
+
+# KB 來源轉檔輸出（由 pipeline.kb_ingest_s3 從 S3 重建，約 20MB 純文字）
+data/kb_source/

@@ -1,0 +1,66 @@
+{
+  "year": 2024,
+  "source": "https://cdn.jsdelivr.net/gh/ruyut/TaiwanCalendar/data/2024.json",
+  "days": {
+    "2024-01-01": {
+      "holiday": true,
+      "desc": "開國紀念日"
+    },
+    "2024-02-08": {
+      "holiday": true,
+      "desc": "小年夜"
+    },
+    "2024-02-09": {
+      "holiday": true,
+      "desc": "農曆除夕"
+    },
+    "2024-02-10": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2024-02-11": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2024-02-12": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2024-02-13": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2024-02-14": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2024-02-17": {
+      "holiday": false,
+      "desc": "補行上班"
+    },
+    "2024-02-28": {
+      "holiday": true,
+      "desc": "和平紀念日"
+    },
+    "2024-04-04": {
+      "holiday": true,
+      "desc": "兒童節及民族掃墓節"
+    },
+    "2024-04-05": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2024-06-10": {
+      "holiday": true,
+      "desc": "端午節"
+    },
+    "2024-09-17": {
+      "holiday": true,
+      "desc": "中秋節"
+    },
+    "2024-10-10": {
+      "holiday": true,
+      "desc": "國慶日"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+# ============================================================================
+# HorizontalPodAutoscaler — 示範「可擴充容器平台」的水平自動擴充能力
+#
+# ★ 誠實標註（競賽規範 ≤1 RPS）：
+#   本專案目前的 Bedrock 節流是「單機鎖」（見 deployment.yaml 檔頭）。
+#   因此這份 HPA 預設 minReplicas=maxReplicas=1，實際上「不」放大副本，
+#   只保留一份完整、正確的 HPA 設定作為平台能力展示與未來啟用點。
+#
+#   要真正啟用水平擴充（把 maxReplicas 調大於 1），前提是先把節流換成
+#   「集中式分散式速率限制」（如 Redis 令牌桶 / DynamoDB 全域 timestamp），
+#   否則多副本會讓帳號層級 Bedrock 呼叫超過 1 RPS，違反規範。
+#
+#   換言之：平台「有能力」水平擴充（本檔即證明），但目前「刻意不開」，
+#   因為正確性（守規範）優先於規模。這是經過取捨的設計決定。
+# ============================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: appeal-workbench
+  namespace: appeal-workbench
+  labels:
+    app.kubernetes.io/name: appeal-workbench
+  annotations:
+    # 啟用水平擴充前必讀：見本檔頭與 deployment.yaml 的 ≤1 RPS 說明。
+    ntpc.hackathon/scaling-note: "Bedrock single-host throttle; keep replicas=1 until a distributed rate limiter exists."
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: appeal-workbench
+  # 刻意鎖在 1：見檔頭的 ≤1 RPS 說明。改大前請先換成分散式限流。
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120

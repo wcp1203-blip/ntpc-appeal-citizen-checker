@@ -1,0 +1,137 @@
+# ============================================================================
+# CI — 把 README「驗證與開發」列的本地檢查自動化，並加上測試與容器建置。
+#
+# 這些檢查全部「不呼叫真實 AWS」：
+#   - compileall / pip check / core dry-run / pytest 皆為離線
+#   - 不需要、也不注入任何 AWS 憑證（符合「憑證不進公開 repo」規範）
+# ============================================================================
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+  workflow_dispatch:
+
+# 最小權限：只讀 repo 內容
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # --------------------------------------------------------------------------
+  # 靜態檢查 + 離線串接 + 單元測試
+  # --------------------------------------------------------------------------
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      # 全程離線：確保 CI 不會意外打真實 Bedrock/KB
+      BEDROCK_DRY_RUN: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt  # 含 pytest（dev 依賴）
+
+      - name: Dependency consistency (pip check)
+        run: python -m pip check
+
+      - name: Compile all sources (syntax / import)
+        run: python -m compileall -q core app lambda_handlers pipeline henry scripts
+
+      - name: Preflight script is runnable (smoke, not a gate)
+        # preflight 的「紅燈」是設計用來擋假資料陷阱的，在無 AWS 的 CI 必然會紅，
+        # 因此這裡只確認腳本能被匯入與執行（--help），不把其退出碼當 CI 成敗。
+        run: python -m scripts.preflight_check --help
+
+      - name: Core offline dry-run (end-to-end wiring)
+        run: python -m core.pipeline --dry-run
+
+      - name: Unit tests (pure-rule modules, offline)
+        run: python -m pytest -q
+
+  # --------------------------------------------------------------------------
+  # 民眾版：只裝 requirements-citizen.txt（不含 boto3），驗證純規則版可獨立運作
+  #
+  # 這一關正是完成標準「在沒安裝 boto3 的乾淨環境裡只用 requirements-citizen.txt
+  # 就能跑起 app/citizen_app.py」的自動化證明：
+  #   - pip 不安裝 boto3，若 core.citizen / citizen_template 誤引 boto3 會直接失敗
+  #   - 明確斷言 boto3 無法 import，再跑民眾版相關測試
+  # --------------------------------------------------------------------------
+  citizen-no-boto3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install citizen-only dependencies (no boto3)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-citizen.txt
+
+      - name: Assert boto3 is NOT installed
+        run: |
+          python - <<'PY'
+          import importlib.util, sys
+          assert importlib.util.find_spec("boto3") is None, "boto3 不應出現在民眾版環境"
+          print("OK: boto3 未安裝，民眾版相依乾淨")
+          PY
+
+      - name: Citizen modules import without boto3
+        run: python -c "import core.citizen, core.citizen_template; print('citizen import ok')"
+
+      - name: Citizen app compiles
+        run: python -m compileall -q app/citizen_app.py core/citizen.py core/citizen_template.py core/holidays.py core/timeline.py
+
+      - name: Citizen unit tests (no boto3)
+        run: >-
+          python -m pytest -q
+          tests/test_citizen.py
+          tests/test_citizen_template.py
+          tests/test_holidays.py
+          tests/test_timeline.py
+          tests/test_defects_no_boto3.py
+
+  # --------------------------------------------------------------------------
+  # 容器建置驗證：確保 Dockerfile build 得起來（不推送映像）
+  # --------------------------------------------------------------------------
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ntpc-appeal-workbench:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

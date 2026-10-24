@@ -1,0 +1,102 @@
+{
+  "year": 2027,
+  "source": "https://cdn.jsdelivr.net/gh/ruyut/TaiwanCalendar/data/2027.json",
+  "days": {
+    "2027-01-01": {
+      "holiday": true,
+      "desc": "開國紀念日"
+    },
+    "2027-02-04": {
+      "holiday": true,
+      "desc": "小年夜"
+    },
+    "2027-02-05": {
+      "holiday": true,
+      "desc": "農曆除夕"
+    },
+    "2027-02-06": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2027-02-07": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2027-02-08": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2027-02-09": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-02-10": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-02-28": {
+      "holiday": true,
+      "desc": "和平紀念日"
+    },
+    "2027-03-01": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-04-04": {
+      "holiday": true,
+      "desc": "兒童節"
+    },
+    "2027-04-05": {
+      "holiday": true,
+      "desc": "清明節"
+    },
+    "2027-04-06": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-04-30": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-05-01": {
+      "holiday": true,
+      "desc": "勞動節"
+    },
+    "2027-06-09": {
+      "holiday": true,
+      "desc": "端午節"
+    },
+    "2027-09-15": {
+      "holiday": true,
+      "desc": "中秋節"
+    },
+    "2027-09-28": {
+      "holiday": true,
+      "desc": "孔子誕辰紀念日/教師節"
+    },
+    "2027-10-10": {
+      "holiday": true,
+      "desc": "國慶日"
+    },
+    "2027-10-11": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-10-25": {
+      "holiday": true,
+      "desc": "臺灣光復暨金門古寧頭大捷紀念日"
+    },
+    "2027-12-24": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2027-12-25": {
+      "holiday": true,
+      "desc": "行憲紀念日"
+    },
+    "2027-12-31": {
+      "holiday": true,
+      "desc": "補假"
+    }
+  }
+}

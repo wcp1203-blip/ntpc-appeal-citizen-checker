@@ -1,0 +1,8 @@
+# 專屬 namespace，隔離資源與配額
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appeal-workbench
+  labels:
+    app.kubernetes.io/name: appeal-workbench
+    app.kubernetes.io/part-of: ntpc-hackathon

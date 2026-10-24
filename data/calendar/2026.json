@@ -1,0 +1,94 @@
+{
+  "year": 2026,
+  "source": "https://cdn.jsdelivr.net/gh/ruyut/TaiwanCalendar/data/2026.json",
+  "days": {
+    "2026-01-01": {
+      "holiday": true,
+      "desc": "開國紀念日"
+    },
+    "2026-02-15": {
+      "holiday": true,
+      "desc": "小年夜"
+    },
+    "2026-02-16": {
+      "holiday": true,
+      "desc": "農曆除夕"
+    },
+    "2026-02-17": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2026-02-18": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2026-02-19": {
+      "holiday": true,
+      "desc": "春節"
+    },
+    "2026-02-20": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-02-27": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-02-28": {
+      "holiday": true,
+      "desc": "和平紀念日"
+    },
+    "2026-04-03": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-04-04": {
+      "holiday": true,
+      "desc": "兒童節"
+    },
+    "2026-04-05": {
+      "holiday": true,
+      "desc": "清明節"
+    },
+    "2026-04-06": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-05-01": {
+      "holiday": true,
+      "desc": "勞動節"
+    },
+    "2026-06-19": {
+      "holiday": true,
+      "desc": "端午節"
+    },
+    "2026-09-25": {
+      "holiday": true,
+      "desc": "中秋節"
+    },
+    "2026-09-28": {
+      "holiday": true,
+      "desc": "孔子誕辰紀念日/教師節"
+    },
+    "2026-10-09": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-10-10": {
+      "holiday": true,
+      "desc": "國慶日"
+    },
+    "2026-10-25": {
+      "holiday": true,
+      "desc": "臺灣光復暨金門古寧頭大捷紀念日"
+    },
+    "2026-10-26": {
+      "holiday": true,
+      "desc": "補假"
+    },
+    "2026-12-25": {
+      "holiday": true,
+      "desc": "行憲紀念日"
+    }
+  }
+}
